@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: datnxdevops.backend
+    image: registry.datnxdevops.site/fullstack/backend:staging
+    restart: always
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    env_file:
+      - .env
+
+  frontend:
+    container_name: datnxdevops.frontend
+    image: registry.datnxdevops.site/fullstack/frontend:staging
+    restart: always
+    ports:
+       - "80:80"
+    depends_on:
+      - backend
+    environment:
+      - VUE_APP_API_URL=http://backend:8081  # URL của backend
+
+
+  db:
+    container_name: db
+    image: postgres:12
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - ./.docker/data/pg:/var/lib/postgresql/data
+      - ./db.sql:/docker-entrypoint-initdb.d/db.sql:ro
